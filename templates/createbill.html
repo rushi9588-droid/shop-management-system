@@ -1,0 +1,632 @@
+{% extends 'base.html' %}
+
+{% block title %}Create Bill - BEST SELECTION{% endblock %}
+
+{% block content %}
+
+<div class="bill-container">
+
+    <!-- BILL HEADER -->
+
+    <div class="bill-header">
+
+        <div>
+            <h1>BEST SELECTION</h1>
+            <p>SHOP MANAGEMENT SYSTEM</p>
+        </div>
+
+        <div class="bill-title">
+            <h2>INVOICE</h2>
+            <p>Date: <span id="currentDate"></span></p>
+        </div>
+
+    </div>
+
+
+    <!-- CUSTOMER DETAILS -->
+
+    <div class="customer-section">
+
+    <div class="customer-box">
+
+        <label>Customer Name</label>
+
+        <input
+            type="text"
+            id="name"
+            name="name"
+            form="billForm"
+            placeholder="Customer Name"
+            required
+        >
+
+    </div>
+
+    <div class="customer-box">
+
+        <label>City</label>
+
+        <input
+            type="text"
+            id="city"
+            name="city"
+            form="billForm"
+            placeholder="City"
+        >
+
+    </div>
+
+    <div class="customer-box">
+
+        <label>Mobile No.</label>
+
+        <input
+            type="text"
+            id="mobile_no"
+            name="mobile_no"
+            form="billForm"
+            placeholder="Mobile Number"
+        >
+
+    </div>
+
+</div>
+
+
+    <!-- BILL FORM -->
+
+    <form
+        id="billForm"
+        action="/createbill"
+        method="POST"
+        onsubmit="prepareBill()"
+    >
+
+        <!-- PRODUCT TABLE -->
+
+        <div class="table-wrapper">
+
+            <table class="bill-table">
+
+                <thead>
+
+                    <tr>
+
+                        <th width="8%">Sr. No.</th>
+
+                        <th width="42%">Product Name</th>
+
+                        <th width="20%">Price</th>
+
+                        <th width="20%">Amount</th>
+
+                        <th width="10%">Action</th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody id="productBody">
+
+                    <tr class="product-row">
+
+                        <td class="serial">1</td>
+
+                        <td>
+                            <input
+                                type="text"
+                                class="product"
+                                placeholder="Enter product name"
+                            >
+                        </td>
+
+                        <td>
+                            <input
+                                type="number"
+                                class="price"
+                                placeholder="0"
+                                min="0"
+                                step="0.01"
+                                oninput="calculateTotal()"
+                            >
+                        </td>
+
+                        <td>
+                            <input
+                                type="number"
+                                class="amount"
+                                value="0"
+                                readonly
+                            >
+                        </td>
+
+                        <td>
+                            <button
+                                type="button"
+                                class="delete-btn"
+                                onclick="deleteRow(this)"
+                            >
+                                ×
+                            </button>
+                        </td>
+
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+        <!-- ADD PRODUCT -->
+
+        <div class="add-product-area">
+
+            <button
+                type="button"
+                class="add-btn"
+                onclick="addProduct()"
+            >
+                + Add Product
+            </button>
+
+        </div>
+
+
+        <!-- BILL SUMMARY -->
+
+        <div class="bill-summary">
+
+            <div class="summary-row">
+
+                <span>Subtotal</span>
+
+                <strong>
+                    <span id="subtotal">0.00</span>
+                </strong>
+
+            </div>
+
+
+            <div class="summary-row">
+
+                <span>Discount</span>
+
+                <input
+                    type="number"
+                    id="discount"
+                    value="0"
+                    min="0"
+                    step="0.01"
+                    oninput="calculateTotal()"
+                >
+
+            </div>
+
+
+            <div class="summary-row grand-total">
+
+                <span>GRAND TOTAL</span>
+
+                <strong>
+                    <span id="grandTotal">0.00</span>
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <!-- HIDDEN VALUES -->
+
+        <input
+            type="hidden"
+            name="products"
+            id="products"
+        >
+
+        <input
+            type="hidden"
+            name="price"
+            id="price"
+        >
+
+        <input
+            type="hidden"
+            name="total"
+            id="total"
+        >
+
+        <input
+            type="hidden"
+            name="bill_date"
+            id="bill_date"
+        >
+        <input
+            type="hidden"
+            name="discount"
+            id="discount_value"
+        >
+
+
+        <!-- BUTTONS -->
+
+        <div class="bill-buttons">
+
+            <button
+                type="submit"
+                class="save-btn"
+            >
+                Save Bill
+            </button>
+
+
+            <button
+                type="button"
+                class="print-btn"
+                onclick="window.print()"
+            >
+                Print Bill
+            </button>
+
+
+            <button
+                type="reset"
+                class="clear-btn"
+                onclick="resetBill()"
+            >
+                Clear
+            </button>
+
+        </div>
+
+    </form>
+
+
+    <!-- FOOTER -->
+
+    <div class="bill-footer">
+
+        <p>Thank You For Shopping With Us!</p>
+
+    </div>
+
+</div>
+
+
+<script>
+
+/* ==========================================
+   CURRENT DATE
+========================================== */
+
+function setDate() {
+
+    let today = new Date();
+
+    let year = today.getFullYear();
+    let month = String(today.getMonth() + 1).padStart(2, '0');
+    let day = String(today.getDate()).padStart(2, '0');
+
+    // Display date: DD/MM/YYYY
+    let displayDate = day + "/" + month + "/" + year;
+
+    document.getElementById("currentDate").innerText = displayDate;
+
+    // MySQL date: YYYY-MM-DD
+    let mysqlDate = year + "-" + month + "-" + day;
+
+    document.getElementById("bill_date").value = mysqlDate;
+}
+
+setDate();
+
+
+/* ==========================================
+   ADD PRODUCT ROW
+========================================== */
+
+function addProduct() {
+
+    let tbody = document.getElementById("productBody");
+
+    let row = document.createElement("tr");
+
+    row.className = "product-row";
+
+    row.innerHTML = `
+
+        <td class="serial"></td>
+
+        <td>
+            <input
+                type="text"
+                class="product"
+                placeholder="Enter product name"
+            >
+        </td>
+
+        <td>
+            <input
+                type="number"
+                class="price"
+                placeholder="0"
+                min="0"
+                step="0.01"
+                oninput="calculateTotal()"
+            >
+        </td>
+
+        <td>
+            <input
+                type="number"
+                class="amount"
+                value="0"
+                readonly
+            >
+        </td>
+
+        <td>
+            <button
+                type="button"
+                class="delete-btn"
+                onclick="deleteRow(this)"
+            >
+                ×
+            </button>
+        </td>
+
+    `;
+
+    tbody.appendChild(row);
+
+    updateSerialNumbers();
+
+}
+
+
+/* ==========================================
+   DELETE PRODUCT
+========================================== */
+
+function deleteRow(button) {
+
+    let rows = document.querySelectorAll(".product-row");
+
+    if (rows.length === 1) {
+
+        alert("At least one product is required.");
+
+        return;
+    }
+
+    button.closest("tr").remove();
+
+    updateSerialNumbers();
+
+    calculateTotal();
+
+}
+
+
+/* ==========================================
+   SERIAL NUMBER
+========================================== */
+
+function updateSerialNumbers() {
+
+    let rows = document.querySelectorAll(".product-row");
+
+    rows.forEach(function(row, index) {
+
+        row.querySelector(".serial").innerText = index + 1;
+
+    });
+
+}
+
+
+/* ==========================================
+   CALCULATE TOTAL
+========================================== */
+
+function calculateTotal() {
+
+    let rows = document.querySelectorAll(".product-row");
+
+    let subtotal = 0;
+
+
+    rows.forEach(function(row) {
+
+        let priceInput = row.querySelector(".price");
+
+        let amountInput = row.querySelector(".amount");
+
+        let price = parseFloat(priceInput.value) || 0;
+
+        amountInput.value = price.toFixed(2);
+
+        subtotal += price;
+
+    });
+
+
+    document.getElementById("subtotal").innerText =
+        subtotal.toFixed(2);
+
+
+    let discount =
+        parseFloat(document.getElementById("discount").value) || 0;
+
+
+    let grandTotal = subtotal - discount;
+
+
+    if (grandTotal < 0) {
+
+        grandTotal = 0;
+
+    }
+
+
+    document.getElementById("grandTotal").innerText =
+        grandTotal.toFixed(2);
+
+}
+
+
+/* ==========================================
+   PREPARE DATA BEFORE SUBMIT
+========================================== */
+
+function prepareBill() {
+
+    let rows = document.querySelectorAll(".product-row");
+
+    let productList = [];
+    let priceList = [];
+
+    let subtotal = 0;
+
+    rows.forEach(function(row) {
+
+        let productInput = row.querySelector(".product");
+        let priceInput = row.querySelector(".price");
+
+        let product = productInput.value.trim();
+        let price = parseFloat(priceInput.value) || 0;
+
+        if (product !== "") {
+
+            productList.push(product);
+
+            priceList.push(price.toFixed(2));
+
+            subtotal += price;
+        }
+
+    });
+
+    // Get discount
+    let discount =
+        parseFloat(document.getElementById("discount").value) || 0;
+
+    // Prevent discount greater than subtotal
+    if (discount > subtotal) {
+        discount = subtotal;
+        document.getElementById("discount").value =
+            discount.toFixed(2);
+    }
+
+    // Final total
+    let total = subtotal - discount;
+
+    // Display subtotal
+    document.getElementById("subtotal").innerText =
+        subtotal.toFixed(2);
+
+    // Display grand total
+    document.getElementById("grandTotal").innerText =
+        total.toFixed(2);
+
+    // Send product names to Flask
+    document.getElementById("products").value =
+        productList.join(",");
+
+    // Send ALL prices to Flask
+    document.getElementById("price").value =
+        priceList.join(",");
+
+    // Send final total to Flask
+    document.getElementById("total").value =
+        total.toFixed(2);
+
+    // Send discount to Flask
+    document.getElementById("discount_value").value =
+        discount.toFixed(2);
+
+    // Set date
+    setDate();
+}
+
+/* ==========================================
+   CLEAR BILL
+========================================== */
+
+function resetBill() {
+
+    setTimeout(function() {
+
+        let tbody =
+            document.getElementById("productBody");
+
+
+        tbody.innerHTML = `
+
+            <tr class="product-row">
+
+                <td class="serial">1</td>
+
+                <td>
+                    <input
+                        type="text"
+                        class="product"
+                        placeholder="Enter product name"
+                    >
+                </td>
+
+                <td>
+                    <input
+                        type="number"
+                        class="price"
+                        placeholder="0"
+                        min="0"
+                        step="0.01"
+                        oninput="calculateTotal()"
+                    >
+                </td>
+
+                <td>
+                    <input
+                        type="number"
+                        class="amount"
+                        value="0"
+                        readonly
+                    >
+                </td>
+
+                <td>
+                    <button
+                        type="button"
+                        class="delete-btn"
+                        onclick="deleteRow(this)"
+                    >
+                        ×
+                    </button>
+                </td>
+
+            </tr>
+
+        `;
+
+
+        document.getElementById("subtotal").innerText =
+            "0.00";
+
+
+        document.getElementById("grandTotal").innerText =
+            "0.00";
+
+
+        setDate();
+
+    }, 10);
+
+}
+
+</script>
+
+{% endblock %}

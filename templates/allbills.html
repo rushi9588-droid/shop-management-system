@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+
+{% block title %}All Bills{% endblock %}
+
+{% block content %}
+
+<style>
+    .bills-wrapper {
+        max-width: 900px;
+        margin: 0 auto;
+    }
+
+    .bills-wrapper h3 {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .bills-table {
+        width: 100%;
+        border-collapse: collapse;
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    .bills-table thead {
+        background: #f9fafb;
+    }
+
+    .bills-table th,
+    .bills-table td {
+        text-align: left;
+        padding: 14px 18px;
+        font-size: 14px;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+    .bills-table th {
+        color: #6b7280;
+        font-weight: 700;
+        text-transform: uppercase;
+        font-size: 12px;
+    }
+
+    .bills-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    .empty-row td {
+        text-align: center;
+        color: #9ca3af;
+        padding: 35px;
+    }
+
+    .pdf-link {
+        display: inline-block;
+        padding: 7px 16px;
+        background: #2563eb;
+        color: #fff;
+        text-decoration: none;
+        border-radius: 6px;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .pdf-link:hover {
+        background: #1d4ed8;
+    }
+</style>
+
+<div class="bills-wrapper">
+
+    <h3>All Bills</h3>
+
+    <table class="bills-table">
+        <thead>
+            <tr>
+                <th style="width: 90px;">Bill ID</th>
+                <th style="width: 110px;">Customer ID</th>
+                <th>Name</th>
+                <th style="width: 140px;">City</th>
+                <th style="width: 120px;">Date</th>
+                <th style="width: 100px;">PDF</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for bill in bills %}
+            <tr>
+                <td>{{ bill.bill_id }}</td>
+                <td>{{ bill.customer_id }}</td>
+                <td>{{ bill.name }}</td>
+                <td>{{ bill.city or "-" }}</td>
+                <td>{{ bill.bill_date.strftime('%d/%m/%Y') if bill.bill_date else '' }}</td>
+                <td>
+                    <a
+                        class="pdf-link"
+                        href="{{ url_for('static', filename='bills/bill_' ~ bill.bill_id ~ '.pdf') }}"
+                        target="_blank"
+                    >
+                        View
+                    </a>
+                </td>
+            </tr>
+            {% else %}
+            <tr class="empty-row">
+                <td colspan="6">No bills created yet.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+</div>
+
+{% endblock %}

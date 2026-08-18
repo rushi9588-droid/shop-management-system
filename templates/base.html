@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Shop Management{% endblock %}</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<div class="container">
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+
+        <h2>ShopMS</h2>
+
+        <a href="/dashboard">Dashboard</a>
+
+        <a href="/total_amount">Total Amount</a>
+
+        <a href="/customer_history">AllCustomers</a>
+        
+        <a href="/suppliers">Suppliers</a>
+        
+        <a href="/saleshistory">Sales_history</a>
+        
+        <a href="/expenses_history">Expenses_history</a>
+        
+        <a href="/allbills">AllBills</a>
+        
+        <a href="/logout">Logout</a>
+    </div>
+
+    <!-- Main Area -->
+    <div class="main">
+
+        <!-- Navbar -->
+        <div class="navbar">
+
+            <h3>BEST SELECTION</h3>
+
+            <span>Welcome Admin</span>
+
+        </div>
+
+        <!-- Page Content -->
+        <div class="content">
+
+            {% block content %}
+            {% endblock %}
+        </div>
+
+
+    </div>
+
+</div>
+
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+
+</body>
+</html>

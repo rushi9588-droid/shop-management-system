@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block title %}Expenses History{% endblock %}
+
+{% block content %}
+
+<style>
+    .expenses-wrapper {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    .expenses-wrapper h3 {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .expenses-table {
+        width: 100%;
+        border-collapse: collapse;
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    .expenses-table thead {
+        background: #f9fafb;
+    }
+
+    .expenses-table th,
+    .expenses-table td {
+        text-align: left;
+        padding: 14px 18px;
+        font-size: 14px;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+    .expenses-table th {
+        color: #6b7280;
+        font-weight: 700;
+        text-transform: uppercase;
+        font-size: 12px;
+    }
+
+    .expenses-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    .empty-row td {
+        text-align: center;
+        color: #9ca3af;
+        padding: 35px;
+    }
+
+    .total-bar {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        gap: 12px;
+        margin-top: 20px;
+        padding: 18px 24px;
+        background: #16213b;
+        color: #fff;
+        border-radius: 10px;
+        font-size: 15px;
+    }
+
+    .total-bar .amount {
+        font-size: 22px;
+        font-weight: 800;
+    }
+</style>
+
+<div class="expenses-wrapper">
+
+    <h3>Expenses History</h3>
+
+    <table class="expenses-table">
+        <thead>
+            <tr>
+                <th style="width: 80px;">ID</th>
+                <th>Name</th>
+                <th style="width: 140px;">Amount</th>
+                <th style="width: 140px;">Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for expense in expenses %}
+            <tr>
+                <td>{{ expense.expense_id }}</td>
+                <td>{{ expense.name }}</td>
+                <td>₹{{ "%.2f"|format(expense.amount) }}</td>
+                <td>{{ expense.expense_date }}</td>
+            </tr>
+            {% else %}
+            <tr class="empty-row">
+                <td colspan="4">No expenses recorded yet.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="total-bar">
+        <span>Total (All Time):</span>
+        <span class="amount">₹{{ "%.2f"|format(total) }}</span>
+    </div>
+
+</div>
+
+{% endblock %}

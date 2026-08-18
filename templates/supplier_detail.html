@@ -1,0 +1,637 @@
+{% extends "base.html" %}
+
+{% block title %}Supplier Detail{% endblock %}
+
+{% block content %}
+
+<style>
+    .ledger-wrapper {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 10px 20px 40px;
+    }
+
+    /* =========================
+       HEADER
+    ========================= */
+
+    .ledger-header {
+        text-align: center;
+        margin-bottom: 28px;
+    }
+
+    .ledger-header h3 {
+        margin: 0 0 8px;
+        font-size: 26px;
+        font-weight: 700;
+        color: #111827;
+    }
+
+    .balance {
+        font-size: 14px;
+        color: #6b7280;
+    }
+
+    .balance strong {
+        color: #111827;
+        font-size: 15px;
+    }
+
+
+    /* =========================
+       ADD ENTRY CARD
+    ========================= */
+
+    .ledger-card {
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 22px 24px;
+        margin-bottom: 28px;
+        box-shadow: 0 3px 12px rgba(0, 0, 0, 0.04);
+    }
+
+    .ledger-card-title {
+        margin-bottom: 18px;
+        font-size: 16px;
+        font-weight: 700;
+        color: #374151;
+    }
+
+    .entry-form {
+        display: flex;
+        align-items: flex-end;
+        gap: 14px;
+    }
+
+    .field {
+        flex: 1;
+    }
+
+    .field label {
+        display: block;
+        margin-bottom: 7px;
+        font-size: 13px;
+        font-weight: 600;
+        color: #4b5563;
+    }
+
+    .field input {
+        width: 100%;
+        height: 44px;
+        padding: 0 13px;
+
+        border: 1px solid #d1d5db;
+        border-radius: 7px;
+
+        background: #ffffff;
+        color: #111827;
+
+        font-size: 14px;
+
+        box-sizing: border-box;
+    }
+
+    .field input:focus {
+        outline: none;
+        border-color: #2563eb;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.10);
+    }
+
+    .submit-btn {
+        height: 44px;
+        padding: 0 22px;
+
+        background: #2563eb;
+        color: white;
+
+        border: none;
+        border-radius: 7px;
+
+        font-size: 14px;
+        font-weight: 600;
+
+        cursor: pointer;
+        white-space: nowrap;
+    }
+
+    .submit-btn:hover {
+        background: #1d4ed8;
+    }
+
+
+    /* =========================
+       LEDGER
+    ========================= */
+
+    .ledger-box {
+        width: 100%;
+        background: #ffffff;
+
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+
+        overflow: hidden;
+
+        box-shadow: 0 3px 12px rgba(0, 0, 0, 0.04);
+    }
+
+    /* TWO SIDES */
+
+    .ledger-head {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .ledger-side-title {
+        padding: 15px 20px;
+
+        font-size: 13px;
+        font-weight: 700;
+
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+
+        text-align: center;
+    }
+
+    .debit-title {
+        background: #fff7f7;
+        color: #dc2626;
+        border-right: 1px solid #e5e7eb;
+    }
+
+    .credit-title {
+        background: #f0fdf4;
+        color: #16a34a;
+    }
+
+
+    /* COLUMN HEADERS */
+
+    .column-head {
+        display: grid;
+        grid-template-columns: 105px 1fr 120px;
+
+        padding: 10px 16px;
+
+        font-size: 11px;
+        font-weight: 700;
+
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    .debit-column-head {
+        background: #fafafa;
+        border-right: 1px solid #e5e7eb;
+        color: #6b7280;
+    }
+
+    .credit-column-head {
+        background: #fafafa;
+        color: #6b7280;
+    }
+
+    .column-head div:last-child {
+        text-align: right;
+    }
+
+
+    /* =========================
+       TRANSACTION ROW
+    ========================= */
+
+    .transaction-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+
+        border-bottom: 1px solid #eef0f3;
+    }
+
+    .transaction-row:last-child {
+        border-bottom: none;
+    }
+
+    .transaction-side {
+        min-height: 75px;
+        padding: 13px 16px;
+
+        display: grid;
+        grid-template-columns: 105px 1fr 120px;
+        align-items: center;
+
+        font-size: 13px;
+    }
+
+    .transaction-side:first-child {
+        border-right: 1px solid #e5e7eb;
+    }
+
+    .transaction-side:hover {
+        background: #f8fafc;
+    }
+
+    /* DATE */
+
+    .transaction-date {
+        color: #6b7280;
+        font-size: 12px;
+    }
+
+    /* DESCRIPTION */
+
+    .transaction-description {
+        color: #374151;
+        padding-right: 10px;
+    }
+
+    /* AMOUNT */
+
+    .transaction-amount {
+        text-align: right;
+        font-size: 14px;
+        font-weight: 700;
+    }
+
+    .debit-amount {
+        color: #dc2626;
+    }
+
+    .credit-amount {
+        color: #16a34a;
+    }
+
+
+    /* =========================
+       EMPTY
+    ========================= */
+
+    .empty-row {
+        padding: 45px 20px;
+
+        text-align: center;
+
+        color: #9ca3af;
+        font-size: 14px;
+    }
+
+
+    /* =========================
+       TOTALS
+    ========================= */
+
+    .ledger-totals {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+
+        background: #16213b;
+        color: white;
+    }
+
+    .total-side {
+        padding: 16px 20px;
+
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        font-size: 14px;
+        font-weight: 700;
+    }
+
+    .total-side:first-child {
+        border-right: 1px solid #2a3a5c;
+    }
+
+    .debit-total {
+        color: #f87171;
+    }
+
+    .credit-total {
+        color: #4ade80;
+    }
+
+
+    /* =========================
+       MOBILE
+    ========================= */
+
+    @media (max-width: 800px) {
+
+        .ledger-wrapper {
+            padding: 10px 12px 30px;
+        }
+
+        .entry-form {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .submit-btn {
+            width: 100%;
+        }
+
+        .column-head {
+            grid-template-columns: 80px 1fr 90px;
+            padding: 10px;
+        }
+
+        .transaction-side {
+            grid-template-columns: 80px 1fr 90px;
+            padding: 12px 10px;
+        }
+
+        .transaction-date {
+            font-size: 11px;
+        }
+
+        .transaction-description {
+            font-size: 12px;
+        }
+
+        .transaction-amount {
+            font-size: 12px;
+        }
+    }
+
+    @media (max-width: 550px) {
+
+        .ledger-head {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .ledger-side-title {
+            font-size: 11px;
+            padding: 13px 5px;
+        }
+
+        .column-head {
+            grid-template-columns: 70px 1fr 80px;
+            font-size: 9px;
+        }
+
+        .transaction-side {
+            grid-template-columns: 70px 1fr 80px;
+        }
+
+        .transaction-date {
+            font-size: 10px;
+        }
+
+        .transaction-description {
+            font-size: 11px;
+        }
+
+        .transaction-amount {
+            font-size: 11px;
+        }
+    }
+</style>
+
+
+<div class="ledger-wrapper">
+
+
+    <!-- SUPPLIER HEADER -->
+
+    <div class="ledger-header">
+
+        <h3>{{ supplier.name }}</h3>
+
+        <div class="balance">
+            Current Balance:
+            <strong>₹{{ "%.2f"|format(supplier.amount) }}</strong>
+        </div>
+
+    </div>
+
+
+    <!-- ADD ENTRY -->
+
+    <div class="ledger-card">
+
+        <div class="ledger-card-title">
+            Add Ledger Entry
+        </div>
+
+        <form
+            class="entry-form"
+            action="/supplier_detail/{{ supplier.supplier_id }}"
+            method="POST"
+        >
+
+            <div class="field">
+
+                <label for="description">
+                    Description
+                </label>
+
+                <input
+                    type="text"
+                    id="description"
+                    name="description"
+                    placeholder="e.g. Fabric purchase"
+                >
+
+            </div>
+
+
+            <div class="field">
+
+                <label for="debit">
+                    Debit
+                </label>
+
+                <input
+                    type="number"
+                    id="debit"
+                    name="debit"
+                    step="0.01"
+                    min="0"
+                    placeholder="0.00"
+                >
+
+            </div>
+
+
+            <div class="field">
+
+                <label for="credit">
+                    Credit
+                </label>
+
+                <input
+                    type="number"
+                    id="credit"
+                    name="credit"
+                    step="0.01"
+                    min="0"
+                    placeholder="0.00"
+                >
+
+            </div>
+
+
+            <button type="submit" class="submit-btn">
+                Add Entry
+            </button>
+
+        </form>
+
+    </div>
+
+
+    <!-- =========================
+         TWO-SIDED LEDGER
+    ========================= -->
+
+    <div class="ledger-box">
+
+
+        <!-- DEBIT / CREDIT TITLES -->
+
+        <div class="ledger-head">
+
+            <div class="ledger-side-title debit-title">
+                Debit
+            </div>
+
+            <div class="ledger-side-title credit-title">
+                Credit
+            </div>
+
+        </div>
+
+
+        <!-- COLUMN HEADERS -->
+
+        <div class="ledger-head">
+
+            <div class="column-head debit-column-head">
+
+                <div>Date</div>
+                <div>Description</div>
+                <div>Amount</div>
+
+            </div>
+
+            <div class="column-head credit-column-head">
+
+                <div>Date</div>
+                <div>Description</div>
+                <div>Amount</div>
+
+            </div>
+
+        </div>
+
+
+        <!-- TRANSACTIONS -->
+
+        {% if transactions %}
+
+            {% for t in transactions %}
+
+            <div class="transaction-row">
+
+
+                <!-- DEBIT SIDE -->
+
+                <div class="transaction-side">
+
+                    <div class="transaction-date">
+                        {{ t.transaction_date }}
+                    </div>
+
+                    <div class="transaction-description">
+                        {{ t.description or "-" }}
+                    </div>
+
+                    <div class="transaction-amount debit-amount">
+
+                        {% if t.debit %}
+                            ₹{{ "%.2f"|format(t.debit) }}
+                        {% else %}
+                            -
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+
+                <!-- CREDIT SIDE -->
+
+                <div class="transaction-side">
+
+                    <div class="transaction-date">
+                        {{ t.transaction_date }}
+                    </div>
+
+                    <div class="transaction-description">
+                        {{ t.description or "-" }}
+                    </div>
+
+                    <div class="transaction-amount credit-amount">
+
+                        {% if t.credit %}
+                            ₹{{ "%.2f"|format(t.credit) }}
+                        {% else %}
+                            -
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+
+            </div>
+
+            {% endfor %}
+
+
+            <!-- TOTALS -->
+
+            <div class="ledger-totals">
+
+                <div class="total-side debit-total">
+
+                    <span>Total Debit</span>
+
+                    <span>
+                        ₹{{ "%.2f"|format(transactions|sum(attribute="debit")) }}
+                    </span>
+
+                </div>
+
+
+                <div class="total-side credit-total">
+
+                    <span>Total Credit</span>
+
+                    <span>
+                        ₹{{ "%.2f"|format(transactions|sum(attribute="credit")) }}
+                    </span>
+
+                </div>
+
+            </div>
+
+
+        {% else %}
+
+            <div class="empty-row">
+                No ledger entries yet.
+            </div>
+
+        {% endif %}
+
+
+    </div>
+
+</div>
+
+{% endblock %}

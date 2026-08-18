@@ -1,0 +1,212 @@
+{% extends "base.html" %}
+
+{% block title %}Bill Saved{% endblock %}
+
+{% block content %}
+
+<style>
+    .success-wrapper {
+        max-width: 480px;
+        margin: 60px auto 0;
+        text-align: center;
+    }
+
+    .success-icon {
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        background: #dcfce7;
+        color: #16a34a;
+        font-size: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 20px;
+    }
+
+    .success-wrapper h3 {
+        margin-bottom: 6px;
+    }
+
+    .success-wrapper .sub {
+        color: #6b7280;
+        font-size: 14px;
+        margin-bottom: 30px;
+    }
+
+    .card {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        padding: 24px;
+        text-align: left;
+        margin-bottom: 20px;
+    }
+
+    .card .row {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 0;
+        font-size: 14px;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+    .card .row:last-child {
+        border-bottom: none;
+    }
+
+    .btn {
+        display: block;
+        width: 100%;
+        padding: 14px;
+        border-radius: 8px;
+        border: none;
+        font-size: 15px;
+        font-weight: 600;
+        cursor: pointer;
+        margin-bottom: 12px;
+        text-decoration: none;
+        box-sizing: border-box;
+    }
+
+    .btn-whatsapp {
+        background: #25D366;
+        color: #fff;
+    }
+
+    .btn-whatsapp:hover {
+        background: #1ebe5b;
+    }
+
+    .btn-download {
+        background: #f3f4f6;
+        color: #111827;
+        border: 1px solid #d1d5db;
+    }
+
+    .btn-download:hover {
+        background: #e5e7eb;
+    }
+
+    .btn-new {
+        background: #2563eb;
+        color: #fff;
+    }
+
+    .btn-new:hover {
+        background: #1d4ed8;
+    }
+
+    #shareStatus {
+        font-size: 13px;
+        color: #6b7280;
+        margin-top: -4px;
+        margin-bottom: 16px;
+        min-height: 18px;
+    }
+</style>
+
+<div class="success-wrapper">
+
+    <div class="success-icon">&#10003;</div>
+
+    <h3>Bill Saved Successfully</h3>
+    <p class="sub">Bill #{{ bill.bill_id }}</p>
+
+    <div class="card">
+        <div class="row">
+            <span>Customer</span>
+            <strong>{{ bill.name }}</strong>
+        </div>
+        <div class="row">
+            <span>Mobile</span>
+            <strong>{{ bill.mobile_no or "-" }}</strong>
+        </div>
+        <div class="row">
+            <span>Total</span>
+            <strong>₹{{ "%.2f"|format(bill.total) }}</strong>
+        </div>
+    </div>
+
+    <button id="whatsappBtn" class="btn btn-whatsapp" onclick="sendOnWhatsApp()">
+        Send on WhatsApp
+    </button>
+
+    <div id="shareStatus"></div>
+
+    <a
+        class="btn btn-download"
+        href="{{ url_for('static', filename='bills/bill_' ~ bill.bill_id ~ '.pdf') }}"
+        target="_blank"
+    >
+        Download PDF
+    </a>
+
+    <a class="btn btn-new" href="/createbill">
+        Create Another Bill
+    </a>
+
+</div>
+
+<script>
+
+    const pdfUrl = "{{ url_for('static', filename='bills/bill_' ~ bill.bill_id ~ '.pdf') }}";
+    const billId = "{{ bill.bill_id }}";
+    const customerMobile = "{{ bill.mobile_no or '' }}";
+    const customerName = "{{ bill.name or '' }}";
+
+    function sendOnWhatsApp() {
+
+        const statusEl = document.getElementById("shareStatus");
+
+        if (!customerMobile) {
+            statusEl.innerText = "No mobile number on this bill - can't open a WhatsApp chat.";
+            return;
+        }
+
+        // ------------------------------------------
+        // STEP 1: Clean up the phone number
+        // Strip spaces/dashes, add India country code
+        // if it's missing (10-digit local number)
+        // ------------------------------------------
+
+        let number = customerMobile.replace(/[^0-9]/g, "");
+
+        if (number.length === 10) {
+            number = "91" + number;
+        }
+
+        // ------------------------------------------
+        // STEP 2: Download the PDF to the phone first,
+        // so it's ready to attach the moment WhatsApp opens
+        // ------------------------------------------
+
+        const link = document.createElement("a");
+        link.href = pdfUrl;
+        link.download = `bill_${billId}.pdf`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        // ------------------------------------------
+        // STEP 3: Open WhatsApp directly on this
+        // customer's chat, with a message pre-filled
+        // ------------------------------------------
+
+        const message = encodeURIComponent(
+            `Hi ${customerName}, thank you for shopping with BEST SELECTION! ` +
+            `Your bill #${billId} PDF has been downloaded - I'm attaching it now.`
+        );
+
+        const waUrl = `https://wa.me/${number}?text=${message}`;
+
+        window.open(waUrl, "_blank");
+
+        statusEl.innerText =
+            "WhatsApp is opening the customer's chat. The PDF is downloading - " +
+            "tap the 📎 attach icon in WhatsApp, choose Document, and pick the downloaded file to send.";
+    }
+
+</script>
+
+{% endblock %}

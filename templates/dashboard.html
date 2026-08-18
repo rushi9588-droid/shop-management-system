@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - BEST SELECTION{% endblock %}
+
+{% block content %}
+
+<h1>Today's Detail</h1>
+
+<div class="cards">
+
+    <div class="card">
+        <a href="/sales">Sales</a>
+        <p>₹{{ sales }}</p>
+    </div>
+
+    <div class="card">
+        <a href="/customers">Customers</a>
+        <p>{{ customers }}</p>
+    </div>
+
+    <div class="card">
+        <a href="/createbill">Create Bills</a>
+        <p>{{ bills_count }}</p>
+    </div>
+
+    <div class="card">
+    <a href="/expenses">Today's Expenses</a>
+    <p>₹{{ "%.2f"|format(expenses|float) }}</p>
+</div>
+
+</div>
+
+{% endblock %}

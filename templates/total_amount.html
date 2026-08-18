@@ -1,0 +1,559 @@
+{% extends "base.html" %}
+
+{% block title %}Total Amount{% endblock %}
+
+{% block content %}
+
+<style>
+    /* ==============================
+       TOTAL AMOUNT PAGE
+    ============================== */
+
+    .total-page {
+        width: 100%;
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 10px 20px 40px;
+        box-sizing: border-box;
+    }
+
+    /* PAGE HEADER */
+    .total-header {
+        margin-bottom: 25px;
+    }
+
+    .total-header h2 {
+        margin: 0;
+        font-size: 28px;
+        font-weight: 700;
+        color: #111827;
+    }
+
+    .total-header p {
+        margin: 7px 0 0;
+        color: #6b7280;
+        font-size: 14px;
+    }
+
+
+    /* ==============================
+       MAIN BOX
+    ============================== */
+
+    .total-box {
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 14px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
+        overflow: hidden;
+    }
+
+
+    /* ==============================
+       FILTER HEADER
+    ============================== */
+
+    .filter-section {
+        padding: 22px 25px;
+        background: #f9fafb;
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    .filter-title {
+        margin-bottom: 15px;
+    }
+
+    .filter-title h4 {
+        margin: 0;
+        font-size: 16px;
+        font-weight: 600;
+        color: #111827;
+    }
+
+    .filter-title span {
+        display: block;
+        margin-top: 4px;
+        color: #6b7280;
+        font-size: 12px;
+    }
+
+
+    /* ==============================
+       DATE FORM
+    ============================== */
+
+    .date-form {
+        display: flex;
+        align-items: flex-end;
+        gap: 15px;
+        flex-wrap: wrap;
+    }
+
+    .date-field {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .date-field label {
+        font-size: 12px;
+        font-weight: 600;
+        color: #374151;
+    }
+
+    .date-field input {
+        width: 180px;
+        height: 42px;
+        padding: 0 12px;
+        box-sizing: border-box;
+
+        border: 1px solid #d1d5db;
+        border-radius: 7px;
+
+        background: #ffffff;
+        color: #111827;
+
+        font-size: 14px;
+        font-family: inherit;
+
+        transition: all 0.2s ease;
+    }
+
+    .date-field input:hover {
+        border-color: #9ca3af;
+    }
+
+    .date-field input:focus {
+        outline: none;
+        border-color: #2563eb;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.10);
+    }
+
+
+    /* VIEW BUTTON */
+
+    .view-btn {
+        height: 42px;
+        padding: 0 24px;
+
+        border: none;
+        border-radius: 7px;
+
+        background: #2563eb;
+        color: white;
+
+        font-size: 14px;
+        font-weight: 600;
+
+        cursor: pointer;
+
+        transition: all 0.2s ease;
+    }
+
+    .view-btn:hover {
+        background: #1d4ed8;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 10px rgba(37, 99, 235, 0.20);
+    }
+
+    .view-btn:active {
+        transform: translateY(0);
+    }
+
+
+    /* ==============================
+       SUMMARY SECTION
+    ============================== */
+
+    .summary-section {
+        padding: 25px;
+    }
+
+    .summary-title {
+        margin-bottom: 18px;
+    }
+
+    .summary-title h4 {
+        margin: 0;
+        font-size: 16px;
+        font-weight: 600;
+        color: #111827;
+    }
+
+
+    /* ==============================
+       SUMMARY CARDS
+    ============================== */
+
+    .summary-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 18px;
+    }
+
+    .summary-card {
+        min-height: 120px;
+        padding: 20px;
+        box-sizing: border-box;
+
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+
+        background: #ffffff;
+
+        position: relative;
+        overflow: hidden;
+
+        transition: all 0.2s ease;
+    }
+
+    .summary-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.07);
+    }
+
+
+    /* CARD TOP BORDER */
+
+    .sales-card {
+        border-top: 4px solid #2563eb;
+    }
+
+    .expense-card {
+        border-top: 4px solid #dc2626;
+    }
+
+    .total-card {
+        border-top: 4px solid #16a34a;
+    }
+
+
+    /* CARD LABEL */
+
+    .card-label {
+        font-size: 13px;
+        color: #6b7280;
+        font-weight: 500;
+        margin-bottom: 10px;
+    }
+
+
+    /* CARD AMOUNT */
+
+    .card-amount {
+        font-size: 24px;
+        font-weight: 700;
+        color: #111827;
+        line-height: 1.2;
+    }
+
+    .sales-card .card-amount {
+        color: #2563eb;
+    }
+
+    .expense-card .card-amount {
+        color: #dc2626;
+    }
+
+
+    /* ==============================
+       NET TOTAL
+    ============================== */
+
+    .total-result {
+        margin-top: 20px;
+        padding: 18px 20px;
+
+        border-radius: 9px;
+
+        background: #f9fafb;
+        border: 1px solid #e5e7eb;
+
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .result-label {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .result-label strong {
+        font-size: 15px;
+        color: #111827;
+    }
+
+    .result-label span {
+        font-size: 12px;
+        color: #6b7280;
+    }
+
+    .result-amount {
+        font-size: 24px;
+        font-weight: 700;
+    }
+
+    .positive-amount {
+        color: #16a34a;
+    }
+
+    .negative-amount {
+        color: #dc2626;
+    }
+
+
+    /* ==============================
+       MOBILE
+    ============================== */
+
+    @media (max-width: 800px) {
+
+        .summary-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .date-form {
+            align-items: stretch;
+        }
+
+        .date-field {
+            width: 100%;
+        }
+
+        .date-field input {
+            width: 100%;
+        }
+
+        .view-btn {
+            width: 100%;
+        }
+    }
+
+
+    @media (max-width: 500px) {
+
+        .total-page {
+            padding: 10px 10px 30px;
+        }
+
+        .total-header h2 {
+            font-size: 23px;
+        }
+
+        .filter-section,
+        .summary-section {
+            padding: 18px;
+        }
+
+        .summary-card {
+            padding: 18px;
+        }
+
+        .card-amount {
+            font-size: 22px;
+        }
+
+        .total-result {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .result-amount {
+            font-size: 22px;
+        }
+    }
+</style>
+
+
+<div class="total-page">
+
+    <!-- PAGE HEADER -->
+    <div class="total-header">
+        <h2>Total Amount</h2>
+        <p>View sales, expenses and total amount for a selected date range.</p>
+    </div>
+
+
+    <!-- MAIN BOX -->
+    <div class="total-box">
+
+
+        <!-- ==============================
+             DATE FILTER
+        =============================== -->
+
+        <div class="filter-section">
+
+            <div class="filter-title">
+                <h4>Select Date Range</h4>
+                <span>Choose the starting and ending date to view the summary.</span>
+            </div>
+
+
+            <form
+                class="date-form"
+                method="GET"
+                action="{{ url_for('total_amount') }}"
+            >
+
+                <!-- FROM DATE -->
+                <div class="date-field">
+
+                    <label for="from_date">
+                        From Date
+                    </label>
+
+                    <input
+                        type="date"
+                        id="from_date"
+                        name="from_date"
+                        value="{{ from_date }}"
+                    >
+
+                </div>
+
+
+                <!-- TO DATE -->
+                <div class="date-field">
+
+                    <label for="to_date">
+                        To Date
+                    </label>
+
+                    <input
+                        type="date"
+                        id="to_date"
+                        name="to_date"
+                        value="{{ to_date }}"
+                    >
+
+                </div>
+
+
+                <!-- BUTTON -->
+                <button
+                    type="submit"
+                    class="view-btn"
+                >
+                    View Summary
+                </button>
+
+            </form>
+
+        </div>
+
+
+
+        <!-- ==============================
+             SUMMARY
+        =============================== -->
+
+        <div class="summary-section">
+
+            <div class="summary-title">
+                <h4>Financial Summary</h4>
+            </div>
+
+
+            <div class="summary-grid">
+
+
+                <!-- SALES -->
+                <div class="summary-card sales-card">
+
+                    <div class="card-label">
+                        Total Sales
+                    </div>
+
+                    <div class="card-amount">
+                        ₹{{ "%.2f"|format(range_sales) }}
+                    </div>
+
+                </div>
+
+
+                <!-- EXPENSES -->
+                <div class="summary-card expense-card">
+
+                    <div class="card-label">
+                        Total Expenses
+                    </div>
+
+                    <div class="card-amount">
+                        ₹{{ "%.2f"|format(range_expenses) }}
+                    </div>
+
+                </div>
+
+
+                <!-- TOTAL -->
+                <div class="summary-card total-card">
+
+                    <div class="card-label">
+                        Net Total
+                    </div>
+
+                    {% if range_total >= 0 %}
+
+                        <div class="card-amount positive-amount">
+                            ₹{{ "%.2f"|format(range_total) }}
+                        </div>
+
+                    {% else %}
+
+                        <div class="card-amount negative-amount">
+                            ₹{{ "%.2f"|format(range_total) }}
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+
+            <!-- ==============================
+                 FINAL RESULT
+            =============================== -->
+
+            <div class="total-result">
+
+                <div class="result-label">
+
+                    <strong>
+                        Total Amount
+                    </strong>
+
+                    <span>
+                        Sales − Expenses
+                    </span>
+
+                </div>
+
+
+                {% if range_total >= 0 %}
+
+                    <div class="result-amount positive-amount">
+                        ₹{{ "%.2f"|format(range_total) }}
+                    </div>
+
+                {% else %}
+
+                    <div class="result-amount negative-amount">
+                        − ₹{{ "%.2f"|format(range_total|abs) }}
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
