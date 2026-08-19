@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, send_file
-from config import connection
+from config import connection,get_connection
 from reportlab.lib.pagesizes import A4
 from reportlab.lib import colors
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
